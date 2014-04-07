@@ -54,7 +54,21 @@ class Img_resize_image {
 	private $out_width;
 	private $dimensions;
 	private $resize_params;
+	
+	private $optimize_settings = array(
 
+		'optipng' => array(
+			'binaries' 	=>	'path/to_binaries/optipng/linux/x86/optipng',
+			'levels' 	=> 	'-o6'
+		),
+		
+		'jpegtran' => array(
+			
+			'binaries' 	=> 'path/to_binaries/jpegtran/linux/x86/jpegtran',
+			
+		)
+	);
+	
 	// Constants
 	const retina_pattern = "@2x";
 
@@ -303,10 +317,12 @@ class Img_resize_image {
 		if ($this->image_type == IMAGETYPE_JPEG)
 		{
 			imagejpeg($this->out_image, $this->out_path, $this->quality);
+			$this->optimize_jpeg();
 		}
 		elseif ($this->image_type == IMAGETYPE_PNG)
 		{
 			imagepng($this->out_image, $this->out_path);
+			$this->optimize_png();
 		}
 		elseif ($this->image_type == IMAGETYPE_GIF)
 		{
@@ -363,6 +379,16 @@ class Img_resize_image {
 		}
 
 		$image->writeImage($this->out_path);
+		
+		if ($this->image_type == IMAGETYPE_JPEG)
+		{
+			$this->optimize_jpeg();
+		}
+		elseif ($this->image_type == IMAGETYPE_PNG)
+		{
+			$this->optimize_png();
+		}
+		
 		$image->destroy();
 	}
 
@@ -667,6 +693,55 @@ class Img_resize_image {
 
 			imageconvolution($this->out_image, $matrix, $divisor, $offset);
 		}
+	}
+	
+	// ------------------------------------------------------------------------
+	
+	/**
+	 * Optimize PNGs
+	 */
+	private function optimize_png() {
+
+		$this->optimize_with_optipng();
+	}
+	
+	private function optimize_with_optipng() {
+		
+		if(!isset($this->optimize_settings['optipng']['binaries']) || $this->optimize == FALSE)
+			return;
+		
+		$levels = isset($this->optimize_settings['optipng']['levels']) ? $this->optimize_settings['optipng']['levels'] : '';
+		
+		exec($this->optimize_settings['optipng']['binaries'] . ' ' . $levels . ' ' . $this->out_path, $output, $result);
+		
+        if ($result != 0)
+        {
+            throw new Exception('OPTIPNG was unable  to optimise image, result:' . $result . ' File: ' . $this->out_path);
+        }
+	}
+	
+	// ------------------------------------------------------------------------
+	
+	/**
+	 * Optimize JPEGs
+	 */
+	private function optimize_jpeg() {
+		
+		$this->optimize_with_jpegtran();
+
+	}
+	
+	private function optimize_with_jpegtran() {
+		
+		if(!isset($this->optimize_settings['jpegtran']['binaries']) || $this->optimize == FALSE)
+			return;
+		
+		exec($this->optimize_settings['jpegtran']['binaries'] . ' -optimize -copy none -outfile ' .$this->out_path . ' ' . $this->out_path, $output, $result);
+		
+        if ($result != 0)
+        {
+            throw new Exception('JPEGTRAN was unable  to optimise image, result:' . $result . ' File: ' . $this->out_path);
+        }
 	}
 
 	// ------------------------------------------------------------------------

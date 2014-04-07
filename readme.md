@@ -4,6 +4,11 @@ Requirements
 - PHP 5+
 - GD2 or Imagick
 
+- optipng for optimizing PNGs (included from https://github.com/yeoman/node-optipng-bin)
+- jpegtran for optimizing JPEGs (included from https://github.com/yeoman/node-jpegtran-bin)
+
+`currently no gif optimization support`
+
 Parameters
 ==========
 
@@ -25,6 +30,7 @@ The following options can also be set globaly in a config file using like `$conf
 **sharpen:** Setting this to 'no' will cause images to be sharpened after they are resized  
 **urldecode:** Setting to 'no' will disable decoding of the src url  
 **handle_retina:** Set to 'no' to disable
+**optimize:** Set to 'yes' to enable image optimization. Default is 'no'
 
 **These should only be set if you know what you are doing**  
 **base\_url:** URL to where your images are stored, default is your base_url  
@@ -45,11 +51,11 @@ These will be set as attributes on the img tag
 Example Usage
 =============
 
-	{exp:img_resize src="/assets/img/imagename.jpg" width="100" height="100" alt="Some alt text"}
+	{exp:img_resize src="/assets/img/imagename.jpg" width="100" height="100" alt="Some alt text" optimize="yes"}
 	// Outputs
 	<img src="http://domain.com/images/resized/assets/img/imagename_100x100.jpg" width="100" height="100" alt="Some alt text">
 
-	{exp:img_resize src="/assets/img/imagename.jpg" width="100" height="100" just_url="yes"}
+	{exp:img_resize src="/assets/img/imagename.jpg" width="100" height="100" just_url="yes" optimize="yes"}
 	// Outputs
 	http://domain.com/images/resized/assets/img/imagename_100x100.jpg
 
@@ -63,6 +69,19 @@ The second image will be 50x50 and named like `image_25x25@2x.png`
 This should provide support for many retina handling methods that use @2x as an identifer, like http://retinajs.com/.
 
 A data-retina attribute will also be set on the img tag containing the url to the retina image.
+
+Image Optimization
+===============
+
+
+`Don't forget to set the binary paths in img_resize/library/img_resize_image.php`
+
+PNGs are optimized with optipng: Feel Free to change the optimization level in img_resize/library/img_resize_image.php:62 (default level is '-o6')
+
+JPEGs are optimized with jpegtran: default options are '-optimize -copy none'
+
+Optimization has not yet been tested with Imagick!
+
 
 Changelog
 =========

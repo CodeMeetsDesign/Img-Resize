@@ -81,6 +81,7 @@ class Img_resize {
 			'quality'       => 100,
 			'sharpen'       => FALSE,
 			'urldecode'     => TRUE,
+			'optimize'		=> FALSE
 		);
 
 		foreach ($options AS $key => $value)

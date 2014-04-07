@@ -1,5 +1,9 @@
 Changelog
 =========
+2.5.0
+
++ Added PNG and JPEG optimization support
+
 2.4.0
 
 + Miscellaneous fixes and improvements under the hood
